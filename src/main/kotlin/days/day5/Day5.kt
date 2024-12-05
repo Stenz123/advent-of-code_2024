@@ -1,7 +1,6 @@
 package days.day5
 
 import days.Day
-import kotlin.math.ceil
 import kotlin.math.floor
 
 class Day5: Day(false) {

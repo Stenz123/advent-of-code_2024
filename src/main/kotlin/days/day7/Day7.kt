@@ -3,21 +3,21 @@ package days.day7
 import days.Day
 
 class Day7: Day(false) {
-    override fun partOne(): Any {
+    override fun partOne() = solve(listOf('+', '*'))
+    override fun partTwo() = solve(listOf('+', '*', '|'))
 
+    fun solve(operators: List<Char>): Long {
         return readInput().sumOf {
             val (rawWantedSol, rawNums) = it.split(":")
             val nums = rawNums.trim().split(" ").map(String::toLong)
             val wantedSol = rawWantedSol.toLong()
-
-            val operators = listOf('+', '*')
-
             makePermutations(operators, nums.size - 1).forEach { perm ->
                 var result = nums[0]
                 for (i in 1 until nums.size) {
                     result = when (perm[i - 1]) {
                         '+' -> result + nums[i]
                         '*' -> result * nums[i]
+                        '|' -> (result.toString() + nums[i].toString()).toLong()
                         else -> throw Exception("Invalid operator")
                     }
                 }
@@ -39,31 +39,4 @@ class Day7: Day(false) {
         }
         return permutations
     }
-
-    override fun partTwo(): Any {
-        return readInput().sumOf {
-            val (rawWantedSol, rawNums) = it.split(":")
-            val nums = rawNums.trim().split(" ").map(String::toLong)
-            val wantedSol = rawWantedSol.toLong()
-
-            val operators = listOf('+', '*', '|')
-
-            makePermutations(operators, nums.size - 1).forEach { perm ->
-                var result = nums[0]
-                for (i in 1 until nums.size) {
-                    result = when (perm[i - 1]) {
-                        '+' -> result + nums[i]
-                        '*' -> result * nums[i]
-                        '|' -> (result.toString() + nums[i].toString()).toLong()
-                        else -> throw Exception("Invalid operator")
-                    }
-                }
-                if (result == wantedSol) {
-                    return@sumOf wantedSol
-                }
-            }
-            return@sumOf 0
-        }
-    }
 }
-

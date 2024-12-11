@@ -1,10 +1,10 @@
 package days.day11
 
+import com.sun.org.apache.xerces.internal.dom.ChildNode
 import days.Day
 
 class Day11: Day(false) {
     override fun partOne(): Any {
-
         var stones = readInput().first().split(" ").map { it.toLong() }
         var count = 0
         repeat(25) {
@@ -30,8 +30,25 @@ class Day11: Day(false) {
         return res
     }
 
+    private fun blonk(stone: Pair<Long, Long>): List<Pair<Long, Long>> = when {
+        stone.first == 0L -> listOf(1L to stone.second)
+        stone.first.toString().length % 2 == 0 -> {
+            val resString = stone.first.toString()
+            listOf(resString.take(resString.length / 2).toLong() to stone.second, resString.takeLast(resString.length / 2).toLong() to stone.second)
+        }
+        else -> listOf(stone.first * 2024L to stone.second)
+    }
+
     override fun partTwo(): Any {
-        return "day 11 part 2 not Implemented"
+        var stones = readInput().first().split(" ").map { it.toLong() to 1L }
+        repeat(75) {
+            stones = stones.map{blonk(it)}.flatten().dedupeAndSum()
+        }
+        return stones.sumOf { it.second }
+    }
+    fun List<Pair<Long, Long>>.dedupeAndSum(): List<Pair<Long, Long>> {
+        return this.groupBy { it.first }
+            .mapValues { (_, values) -> values.sumOf { it.second } }.toList()
     }
 }
 

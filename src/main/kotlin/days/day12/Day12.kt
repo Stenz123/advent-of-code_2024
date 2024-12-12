@@ -40,8 +40,6 @@ class Day12: Day(false) {
 
     override fun partTwo(): Any {
         val map = makeItFat(readInput()).parseToMap()
-        //todo make map fat
-
         fun Set<Pair<Int, Int>>.walkEdge(): Int {
             val edgeTiles = this.filter { item -> item.get4Neighbours().filter { map[it] == map[item] }.size < 4 }.sortedBy { it.first }
 
@@ -78,7 +76,6 @@ class Day12: Day(false) {
             return res
         }
         return map.values.toSet().sumOf { value ->
-            println(value)
             return@sumOf getFields(map, value).sumOf{field -> field.walkEdge() * field.size / 4 }
         }
     }
@@ -108,23 +105,6 @@ class Day12: Day(false) {
         }while (current != actualStart || direction != startDirection)
         return res
     }
-
-
-    fun Map<Pair<Int, Int>, Char>.visualize(colored: List<Pair<Set<Pair<Int, Int>>, String>> = listOf()) {
-        for (i in -1..this.keys.maxOf { it.first }+1) {
-            for (j in -1..this.keys.maxOf { it.second }+1) {
-                if (colored.any { i to j in it.first }) {
-                    val asf = colored.first{ it.first.contains(i to j) }
-                    print(asf.second+this[i to j]+ConsoleColors.RESET)
-                } else {
-                    print(this[i to j]?:".")
-                }
-
-            }
-            println()
-        }
-    }
-
 
     fun makeItFat(input: List<String>): List<String> {
         val output = mutableListOf<String>()

@@ -1,16 +1,12 @@
 package days.day12
 
 import days.Day
-import days.util.get4Neighbours
-import days.util.parseToMap
+import days.util.*
 
 class Day12: Day(false) {
     override fun partOne(): Any {
         val map = readInput().parseToMap()
         return map.values.toSet().sumOf { value ->
-
-            println("value: $value")
-
             return@sumOf getFields(map, value).sumOf{field -> field.sumOf { key ->
                     key.get4Neighbours().filter { map[it] != value }.size
                 } * field.size
@@ -41,8 +37,108 @@ class Day12: Day(false) {
         return fields
     }
 
+
     override fun partTwo(): Any {
-        return "day 12 part 2 not Implemented"
+        val map = makeItFat(readInput()).parseToMap()
+        //todo make map fat
+
+        fun Set<Pair<Int, Int>>.walkEdge(): Int {
+            val edgeTiles = this.filter { item -> item.get4Neighbours().filter { map[it] == map[item] }.size < 4 }.sortedBy { it.first }
+
+            //Outer circle
+            val startDirection = Direction.WEST
+            val actualStart = edgeTiles.first().north()
+            var current = actualStart
+            var direction = startDirection
+
+            var res = 0
+            val visited = mutableSetOf<Pair<Int, Int>>()
+
+            do {
+                val next = current.move(direction)
+                if (next.move(direction.turnLeft()) !in this) {
+                    direction = direction.turnLeft()
+                    current = next.move(direction)
+                    visited.add(current.move(direction.turnLeft()))
+                    res++
+                } else if (next in this) {
+                    direction = direction.turnRight()
+                    visited.add(next)
+                    res++
+                } else {
+                    visited.add(next.move(direction.turnLeft()))
+                    current = next
+                }
+            }while (current != actualStart || direction != startDirection)
+
+            while (visited.size < edgeTiles.size) {
+                res += hole(visited, edgeTiles, map)
+            }
+
+            return res
+        }
+        return map.values.toSet().sumOf { value ->
+            println(value)
+            return@sumOf getFields(map, value).sumOf{field -> field.walkEdge() * field.size / 4 }
+        }
+    }
+    private fun hole(visited: MutableSet<Pair<Int, Int>>, edgeTiles: List<Pair<Int, Int>>, map: HashMap<Pair<Int, Int>, Char>): Int {
+
+        val startDirection = Direction.WEST
+        val actualStart = edgeTiles.first{it !in visited}.south()
+        var current = actualStart
+        var direction = startDirection
+        var res = 0
+        do {
+            //map.visualize(listOf(setOf(current) to ConsoleColors.GREEN_BACKGROUND, visited to ConsoleColors.RED_BACKGROUND, edgeTiles.toSet() to ConsoleColors.BLUE_BACKGROUND, ))
+            val next = current.move(direction)
+            if (next in edgeTiles) {
+                direction = direction.turnLeft()
+                visited.add(next)
+                res++
+            } else if (next.move(direction.turnRight()) !in edgeTiles) {
+                direction = direction.turnRight()
+                current = next.move(direction)
+                visited.add(current.move(direction.turnRight()))
+                res++
+            } else {
+                visited.add(next.move(direction.turnRight()))
+                current = next
+            }
+        }while (current != actualStart || direction != startDirection)
+        return res
+    }
+
+
+    fun Map<Pair<Int, Int>, Char>.visualize(colored: List<Pair<Set<Pair<Int, Int>>, String>> = listOf()) {
+        for (i in -1..this.keys.maxOf { it.first }+1) {
+            for (j in -1..this.keys.maxOf { it.second }+1) {
+                if (colored.any { i to j in it.first }) {
+                    val asf = colored.first{ it.first.contains(i to j) }
+                    print(asf.second+this[i to j]+ConsoleColors.RESET)
+                } else {
+                    print(this[i to j]?:".")
+                }
+
+            }
+            println()
+        }
+    }
+
+
+    fun makeItFat(input: List<String>): List<String> {
+        val output = mutableListOf<String>()
+
+        input.forEach {
+            val stringBuilder = StringBuilder()
+            it.forEach { char ->
+                stringBuilder.append(char)
+                stringBuilder.append(char)
+            }
+            output.add(stringBuilder.toString())
+            output.add(stringBuilder.toString())
+        }
+        return output
     }
 }
 

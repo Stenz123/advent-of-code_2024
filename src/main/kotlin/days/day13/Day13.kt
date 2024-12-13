@@ -3,18 +3,12 @@ package days.day13
 import days.Day
 
 class Day13: Day(false) {
-    override fun partOne() = Machine.fromString(readInput()).sumOf{ machine ->
+    override fun partOne() = solve()
+    override fun partTwo() = solve(10000000000000L)
+    private fun solve(add: Long = 0L) = Machine.fromString(readInput()).sumOf{ machine ->
             val (aPressed, bPressed) = solveEquations(
-                machine.a.first.toLong(), machine.b.first.toLong(), machine.price.first.toLong(),
-                machine.a.second.toLong(), machine.b.second.toLong(), machine.price.second.toLong()
-            ).takeIf { it[0] != -1L && it[1] != -1L } ?: return@sumOf 0L
-            return@sumOf aPressed * 3L + bPressed
-        }
-
-    override fun partTwo() = Machine.fromString(readInput()).sumOf{ machine ->
-            val (aPressed, bPressed) = solveEquations(
-                machine.a.first.toLong(), machine.b.first.toLong(), machine.price.first+10000000000000,
-                machine.a.second.toLong(), machine.b.second.toLong(), machine.price.second+10000000000000
+                machine.a.first.toLong(), machine.b.first.toLong(), machine.price.first+add,
+                machine.a.second.toLong(), machine.b.second.toLong(), machine.price.second+add
             ).takeIf { it[0] != -1L && it[1] != -1L } ?: return@sumOf 0L
             return@sumOf aPressed * 3L + bPressed
         }
@@ -35,11 +29,7 @@ class Day13: Day(false) {
         return longArrayOf(detX / det, detY / det)
     }
 
-    data class Machine(
-        val a: Pair<Int, Int>,
-        val b: Pair<Int, Int>,
-        val price: Pair<Int, Int>
-    ){
+    data class Machine(val a: Pair<Int, Int>, val b: Pair<Int, Int>, val price: Pair<Int, Int>){
         companion object {
             fun fromString(str: List<String>): List<Machine> {
                 val machines = mutableListOf<Machine>()

@@ -14,14 +14,6 @@ class Day14: Day(false) {
             guards.forEach { it.move(xRange, yRange) }
         }
 
-        for (y in yRange){
-            for (x in xRange){
-                val count = guards.count { it.position.first == x && it.position.second == y }
-                print(if (count > 0) count else ".")
-            }
-            println()
-        }
-
         val q14X = if (super.useExampleInput) 6 until 11 else 51 until 101
         val q23X = if (super.useExampleInput) 0 until 5 else 0 until 50
         val q12Y = if (super.useExampleInput) 0 until 3 else 0 until 51
@@ -79,7 +71,7 @@ class Day14: Day(false) {
         return resSec
     }
 
-    fun countInRange(xRange: IntRange, yRange: IntRange, guards: List<Guard>): Int = guards.count { it.position.first in xRange && it.position.second in yRange }
+    private fun countInRange(xRange: IntRange, yRange: IntRange, guards: List<Guard>): Int = guards.count { it.position.first in xRange && it.position.second in yRange }
 
     data class Guard(var position: Pair<Int, Int>, var velocity: Pair<Int, Int>){
         fun move(xRange: IntRange, yRange: IntRange){

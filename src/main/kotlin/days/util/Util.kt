@@ -4,9 +4,7 @@ fun List<String>.parseToMap(): HashMap<Pair<Int, Int>, Char> {
     val map = hashMapOf<Pair<Int, Int>, Char>()
     this.forEachIndexed{i, line ->
         line.forEachIndexed{ j, char ->
-            if (char != '.') {
-                map[i to j] = char
-            }
+            map[i to j] = char
         }
     }
     return map
@@ -64,3 +62,7 @@ fun Pair<Int, Int>.north() = this.first - 1 to this.second
 fun Pair<Int, Int>.east() = this.first to this.second + 1
 fun Pair<Int, Int>.south() = this.first + 1 to this.second
 fun Pair<Int, Int>.west() = this.first to this.second - 1
+
+operator fun Pair<Int, Int>.minus(subtractor: Pair<Int, Int>) = this.first - subtractor.first to this.second - subtractor.second
+operator fun Pair<Int, Int>.plus(addend: Pair<Int, Int>) = this.first + addend.first to this.second + addend.second
+operator fun Pair<Int, Int>.times(multiplier: Int) = this.first * multiplier to this.second * multiplier

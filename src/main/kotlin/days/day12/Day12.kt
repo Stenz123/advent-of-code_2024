@@ -5,7 +5,7 @@ import days.util.*
 
 class Day12: Day(false) {
     override fun partOne(): Any {
-        val map = readInput().parseToMap()
+        val map = readInput().parseToMap().filter { it.value != '.' }
         return map.values.toSet().sumOf { value ->
             return@sumOf getFields(map, value).sumOf{field -> field.sumOf { key ->
                     key.get4Neighbours().filter { map[it] != value }.size
@@ -14,7 +14,7 @@ class Day12: Day(false) {
         }
     }
 
-    fun getFields(map: HashMap<Pair<Int, Int>, Char>, value: Char): Set<Set<Pair<Int, Int>>> {
+    fun getFields(map: Map<Pair<Int, Int>, Char>, value: Char): Set<Set<Pair<Int, Int>>> {
         val fields = mutableSetOf<Set<Pair<Int, Int>>>()
         val visited = mutableSetOf<Pair<Int, Int>>()
 
@@ -39,7 +39,7 @@ class Day12: Day(false) {
 
 
     override fun partTwo(): Any {
-        val map = makeItFat(readInput()).parseToMap()
+        val map = makeItFat(readInput()).parseToMap().filter { it.value != '.' }
         fun Set<Pair<Int, Int>>.walkEdge(): Int {
             val edgeTiles = this.filter { item -> item.get4Neighbours().filter { map[it] == map[item] }.size < 4 }.sortedBy { it.first }
 
@@ -79,7 +79,7 @@ class Day12: Day(false) {
             return@sumOf getFields(map, value).sumOf{field -> field.walkEdge() * field.size / 4 }
         }
     }
-    private fun hole(visited: MutableSet<Pair<Int, Int>>, edgeTiles: List<Pair<Int, Int>>, map: HashMap<Pair<Int, Int>, Char>): Int {
+    private fun hole(visited: MutableSet<Pair<Int, Int>>, edgeTiles: List<Pair<Int, Int>>, map: Map<Pair<Int, Int>, Char>): Int {
 
         val startDirection = Direction.WEST
         val actualStart = edgeTiles.first{it !in visited}.south()

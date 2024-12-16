@@ -8,7 +8,7 @@ import java.util.*
 import kotlin.collections.ArrayDeque
 import kotlin.collections.HashMap
 
-class Day16: Day(true) {
+class Day16: Day(false) {
     val map = readInput().parseToMap().filter { it.value == '.' || it.value == 'S' || it.value == 'E' }
     val start = map.filter { it.value == 'S' }.keys.first()
     val end = map.filter { it.value == 'E' }.keys.first()
@@ -34,13 +34,17 @@ class Day16: Day(true) {
         val cost = djikstraWeighted(map.keys.toList(), start, end, cost = true) as Int
         val initialTiles = djikstraWeighted(map.keys.toList(), start, end) as  List<Pair<Int, Int>>
         val blockingTiles: PriorityQueue<List<Pair<Int, Int>>> = PriorityQueue(compareBy{it.size})
-        blockingTiles.addAll(initialTiles.filter { it.get4Neighbours().count{ it in map } > 2 }.map { listOf(it)})
-        val finalTiles = blockingTiles.peek().toMutableSet()
+        blockingTiles.addAll(initialTiles.map { listOf(it)})
+        val finalTiles = initialTiles.toMutableSet()
 
         while (blockingTiles.isNotEmpty()) {
             val tileToRemove = blockingTiles.poll()
             val newTiles = (djikstraWeighted(map.keys.filter { it !in tileToRemove  }, start, end, cost) as List<Pair<Int, Int>>)
-                .filter { finalTiles.add(it) && it.get4Neighbours().count{ it in map} > 2}
+                .filter { finalTiles.add(it) /*&& it.get4Neighbours().count{ it in map} > 2*/}
+            if (newTiles.isNotEmpty()) {
+                println("Final tiles: ${ConsoleColors.GREEN}${finalTiles.size}${ConsoleColors.RESET}")
+            }
+            println("tiles to remove: ${blockingTiles.size}")
             blockingTiles.addAll(newTiles.flatMap { listOf(tileToRemove + it) })
         }
         printMap(finalTiles)

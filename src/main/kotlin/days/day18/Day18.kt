@@ -47,22 +47,32 @@ class Day18: Day(false) {
                 tiles[i to j] = tiles.getOrDefault(i to j, false)
             }
         }
-        readInput().forEachIndexed { index, line ->
+        val newTiles = readInput().map { line ->
             val split = line.split(",").map { it.toInt() }
-            tiles[split[0] to split[1]] = true
-            println(index)
-            try {
-                if (index > 1024) {
-                    PathFinding.djikstras(tiles.keys.toList(), start, end) { c ->
-                        c.get4Neighbours().filter { it in tiles && tiles[it] == false }
-                    }
-                }
-            } catch (e: Exception) {
-                return "${split[0]},${split[1]}"
-            }
+            split[0] to split[1]
         }
 
-        return "day 18 part 2 not Implemented"
+        var l = 0
+        var r = newTiles.size
+
+
+        while (true) {
+            val m = (l + r) / 2
+            val tilesR = newTiles.take(m)
+            try {
+                PathFinding.djikstras(tiles.keys.toList(), start, end) { c ->
+                    c.get4Neighbours().filter { (it.first in 0..70) && (it.second in 0..70) && it !in tilesR }
+                }
+                l = m + 1
+            } catch (e: Exception) {
+                try {
+                    PathFinding.djikstras(tiles.keys.toList(), start, end) { c ->
+                        c.get4Neighbours().filter { (it.first in 0..70) && (it.second in 0..70) && it !in tilesR.take(m-1) }
+                    }
+                    return "${newTiles[m-1].first},${newTiles[m-1].second}"
+                }catch (e: Exception) { r = m - 1 }
+            }
+        }
     }
 }
 

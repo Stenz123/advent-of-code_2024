@@ -48,6 +48,7 @@ object PathFinding {
                 }
             }
         }
+        if (prev[end] == null) throw Exception("No path found")
         return reconstructPath(prev, start, end)
     }
 

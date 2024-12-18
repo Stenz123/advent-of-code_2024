@@ -9,25 +9,32 @@ class Day17: Day(false) {
     val C = readInput()[2].substringAfter("C: ").toLong()
     override fun partOne(): Any {
         val instructions = readInput()[4].substringAfter("Program: ").split(",").map { it.toInt() }
-        val program = Program(A, B, C)
-        return program.run(instructions).joinToString(",")
+        println(Program(37221274271220L, B, C).run(instructions).joinToString(","))
+        println(listOf(2, 4, 1, 2, 7, 5, 4, 7, 1, 3, 5, 5, 0, 3, 3, 0).joinToString(","))
+
+
+        return 0
     }
 
     override fun partTwo(): Any {
         val instructions = readInput()[4].substringAfter("Program: ").split(",").map { it.toInt() }
-        val program = Program(A, B, C)
+        val toReplicate = listOf(2, 4, 1, 2, 7, 5, 4, 7, 1, 3, 5, 5, 0, 3, 3, 0)
 
-        var a:Long = 1
-        while (true) {
-            try {
-                Program(a, B, C).run(instructions, true).let {
-                    if (it.isNotEmpty() && it == instructions) return a
-                }
-            }catch (_: Exception) {}
-            a++
-            if (a % 100000000L == 0L) println(a)
-        }
+        return findA(instructions, toReplicate)
     }
+
+    private fun findA(program: List<Int>, target: List<Int>): Long {
+        var a = if (target.size == 1) {
+            0
+        } else {
+            8 * findA(program, target.subList(1, target.size))
+        }
+        while( Program(a, 0, 0).run(program) != target) {
+            a++
+        }
+        return a
+    }
+
 
     class Program(
         var A: Long,

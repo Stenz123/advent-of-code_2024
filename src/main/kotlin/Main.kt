@@ -1,7 +1,7 @@
-import days.day17.Day17
+import days.day18.Day18
 
 fun main() {
-    val currentDay = Day17()
+    val currentDay = Day18()
 
     currentDay.solvePartOne()
     currentDay.solvePartTwo()

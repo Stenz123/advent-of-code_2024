@@ -1,10 +1,9 @@
 package days.day21
 
 import days.Day
-import days.util.Direction
 import days.util.arrowToDirection
 import days.util.move
-import kotlin.math.log
+import kotlin.math.max
 
 /*
     +---+---+---+           +---+---+
@@ -15,77 +14,81 @@ import kotlin.math.log
     | 1 | 2 | 3 |
     +---+---+---+
         | 0 | A |
-        +---+---+       .
+        +---+---+
 */
 
-class Day21: Day(false) {
+class Day21: Day(true) {
+    val cache = mutableMapOf<Triple<String, Int, Int>, Long>()
     override fun partOne(): Any {
-        val res = robotStuff(readInput(), NumpadRobot()).map {
-            println("")
-            println("----")
-            it.forEach { println(it) }
-            robotStuff(it, DirectionRobot()).map {
-                println("---------")
-                it.forEach { println(it) }
-                robotStuff(it, DirectionRobot()).flatten()
-            }.flatten()
-        }
-
-        var ress = 0
-        res.forEachIndexed { index, it ->
-            ress += (it.map { it.length }.minOrNull()!! * readInput()[index].substringBefore("A").toInt())
-        }
-
-        return ress
+        return -1
     }
 
     override fun partTwo(): Any {
-        return "day 21 part 2 not Implemented"
+
+        fun recursiveRobotStuff(depth: Int, maxDepth: Int, sequence: String): Long {
+        val key = Triple(sequence, depth, maxDepth)
+        return cache.getOrPut(key) {
+            sequence.fold(0L) { sum, char ->
+                val robot = if (depth == 0) NumpadRobot() else DirectionRobot()
+                val paths = getPaths(sequence, robot)
+                sum + if (depth == maxDepth) {
+                    paths.minOfOrNull { it.length }?.toLong() ?: 0L
+                } else {
+                    paths.minOfOrNull { recursiveRobotStuff(depth + 1, maxDepth, it) }?.toLong() ?: 0L
+                }
+            }
+        }
     }
 
-    fun robotStuff(codes: List<String>, robot: Robot): List<List<String>> {
-        val res = codes.map { code ->
-            var numPadPaths = listOf("")
-            var prevChar = 'A'
-            code.map { char ->
-                val newNumPadPaths = (numPadPaths).toMutableList()
-                numPadPaths.forEach { mutation ->
-                    newNumPadPaths.remove(mutation)
-                    newNumPadPaths.addAll(robot.move(char, prevChar).map { mutation + it })
-                }
-                numPadPaths = newNumPadPaths
-                prevChar = char
-            }
-            return@map numPadPaths
+        return readInput().forEach{
+            println(recursiveRobotStuff(0, 2, it).toString())
         }
+    }
+
+
+
+
+    fun getPaths(code: String, robot: Robot): List<String> {
+        var numPadPaths = listOf("")
+        var prevChar = 'A'
+         code.forEach { char ->
+
+            val newNumPadPaths = (numPadPaths).toMutableList()
+            numPadPaths.forEach { mutation ->
+                newNumPadPaths.remove(mutation)
+                newNumPadPaths.addAll(robot.move(char, prevChar).map { mutation + it })
+            }
+            numPadPaths = newNumPadPaths
+            prevChar = char
+        }
+        return numPadPaths
+    }
+
+    abstract class Robot() {
+
+    fun move(char: Char, oldChar: Char): List<String> {
+        val currentPosition = charToCoord(oldChar)
+        val newCoord = charToCoord(char)
+        val y = newCoord.first - currentPosition.first
+        val x = newCoord.second - currentPosition.second
+
+        var result = ""
+        result += if (x > 0) ">".repeat(x) else "<".repeat(-x)
+        result += if (y < 0) "^".repeat(-y) else "v".repeat(y)
+
+        val res = listOf(result, result.reversed()).filter { string ->
+            var tempCoord = currentPosition
+            var i = 0
+            while (tempCoord != newCoord) {
+                tempCoord = tempCoord.move(arrowToDirection(string[i]))
+                i++
+                if (getIllegalField() == tempCoord) return@filter false
+            }
+            true
+        }.distinct().map { it + "A" }
+
         return res
     }
-
-abstract class Robot{
-    fun move(char: Char, oldChar: Char): List<String>{
-       val currentPosition = charToCoord(oldChar)
-       val newCoord = charToCoord(char)
-       val y = newCoord.first - currentPosition.first
-       val x = newCoord.second - currentPosition.second
-
-       var result = ""
-       result += if (x > 0) ">".repeat(x)
-       else "<".repeat(-x)
-       result += if (y < 0) "^".repeat(-y)
-       else "v".repeat(y)
-
-
-       return listOf(result, result.reversed()).filter { string ->
-           var tempCoord = currentPosition!!
-           var i = 0
-           while (tempCoord != newCoord) {
-               tempCoord = tempCoord.move(arrowToDirection(string[i]))
-               i++
-               if (getIllegalField() == tempCoord) return@filter false
-           }
-           return@filter true
-       }.distinct().map { it + "A" }
-   }
 
     fun stringToCoord(dirs: String): Pair<Int, Int> {
         val dirs = dirs.groupingBy { it }.eachCount()
@@ -101,7 +104,7 @@ abstract class Robot{
    abstract fun charToCoord(char: Char): Pair<Int, Int>
 }
 
-class DirectionRobot : Robot() {
+    class DirectionRobot() : Robot() {
     override fun getIllegalField() = 0 to 0
 
     override fun charToCoord(char: Char): Pair<Int, Int> = when (char) {
@@ -134,5 +137,10 @@ class NumpadRobot(): Robot(){
         else -> throw RuntimeException("Invalid character")
     }
 }
+    data class CachingState(
+        val current: Char,
+        val destination: Char,
+        val numberOfRobots: Int,
+    )
 }
 

@@ -17,34 +17,39 @@ import kotlin.math.max
         +---+---+
 */
 
-class Day21: Day(true) {
+class Day21: Day(false) {
     val cache = mutableMapOf<Triple<String, Int, Int>, Long>()
     override fun partOne(): Any {
-        return -1
+        return readInput().sumOf{
+            println("${recursiveRobotStuff(0, 2, it)} * ${it.substringBefore('A').toInt()}")
+            recursiveRobotStuff(0, 2, it) * it.substringBefore('A').toInt()
+        }
     }
 
     override fun partTwo(): Any {
 
-        fun recursiveRobotStuff(depth: Int, maxDepth: Int, sequence: String): Long {
+
+
+        return readInput().sumOf{
+            println("${recursiveRobotStuff(0, 2, it)} * ${it.substringBefore('A').toInt()}")
+            recursiveRobotStuff(0, 25, it) * it.substringBefore('A').toInt()
+        }
+    }
+
+    fun recursiveRobotStuff(depth: Int, maxDepth: Int, sequence: String): Long {
         val key = Triple(sequence, depth, maxDepth)
         return cache.getOrPut(key) {
-            sequence.fold(0L) { sum, char ->
-                val robot = if (depth == 0) NumpadRobot() else DirectionRobot()
-                val paths = getPaths(sequence, robot)
-                sum + if (depth == maxDepth) {
+            val robot = if (depth == 0) NumpadRobot() else DirectionRobot()
+            sequence.fold('A' to 0L) { (prevChar ,sum), char ->
+                val paths = robot.move(char, prevChar)
+                char to (sum + if (depth == maxDepth) {
                     paths.minOfOrNull { it.length }?.toLong() ?: 0L
                 } else {
                     paths.minOfOrNull { recursiveRobotStuff(depth + 1, maxDepth, it) }?.toLong() ?: 0L
-                }
-            }
+                })
+            }.second
         }
     }
-
-        return readInput().forEach{
-            println(recursiveRobotStuff(0, 2, it).toString())
-        }
-    }
-
 
 
 

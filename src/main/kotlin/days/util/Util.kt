@@ -28,6 +28,14 @@ fun Pair<Int, Int>.get8Neighbours() = listOf(
         this.first + 1 to this.second + 1,
     )
 
+fun arrowToDirection(arrow: Char) = when (arrow) {
+    '>' -> Direction.EAST
+    '<' -> Direction.WEST
+    '^' -> Direction.NORTH
+    'v' -> Direction.SOUTH
+    else -> throw IllegalArgumentException("Invalid arrow direction")
+}
+
 enum class Direction {
     NORTH, EAST, SOUTH, WEST
 }

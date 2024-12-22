@@ -2,10 +2,6 @@ package days.day22
 
 import days.Day
 import days.util.ConsoleColors
-import java.util.concurrent.Executors
-import java.util.concurrent.TimeUnit
-import java.util.concurrent.atomic.AtomicInteger
-import kotlin.math.truncate
 
 class Day22: Day(false) {
     override fun partOne(): Any {
@@ -43,7 +39,6 @@ class Day22: Day(false) {
         }
 
         var maxBananas = 0
-
         val combinations = prices.map { price ->
             List(price.size - 3) { index ->
                 price.subList(index, index + 4).map { it.second }

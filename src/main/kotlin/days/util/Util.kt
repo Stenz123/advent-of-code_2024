@@ -1,5 +1,7 @@
 package days.util
 
+fun Boolean.toInt() = if (this) 1 else 0
+
 fun List<String>.parseToMap(): HashMap<Pair<Int, Int>, Char> {
     val map = hashMapOf<Pair<Int, Int>, Char>()
     this.forEachIndexed{i, line ->

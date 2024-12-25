@@ -22,7 +22,7 @@ class Day25: Day(false) {
     }
 
     override fun partTwo(): Any {
-        return "day 25 part 2 not Implemented"
+        return "50 Starts YAAAAYYYYY!!!!!!!!!"
     }
 
     fun fit(lock: List<Int>, key: List<Int>): Boolean {
